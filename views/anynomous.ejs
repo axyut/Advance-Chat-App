@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+
+<div class="join-container">
+    <main class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-body">
+
+                        <!-- Makes POST request to /login route -->
+                        <form action="/chat-anynomous" method="GET">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <input type="text" class="form-control" name="username" id="username" required>
+                            </div>
+                            <div class="form-control">
+                                <label for="room">Room</label>
+                                <select name="room" id="room">
+                                    <option value="Friends">Friends</option>
+                                    <option value="Family">Family</option>
+                                    <option value="Backbencher">Backbencher</option>
+                                    <option value="Parliament">Parliament</option>
+                                    <option value="Sangathan">Sangathan</option>
+                                    <option value="Raila">Raila</option>
+                                </select>
+                            </div> <br> <br>
+                            <button type="submit" class="btn btn-dark">Join Chat</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+
+<%- include('partials/footer') %>
