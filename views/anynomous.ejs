@@ -12,19 +12,18 @@
                         <form action="/chat-anynomous" method="GET">
                             <div class="form-group">
                                 <label for="username">Username</label>
-                                <input type="text" class="form-control" name="username" id="username" required>
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Email or Username" required>
                             </div>
-                            <div class="form-control">
-                                <label for="room">Room</label>
-                                <select name="room" id="room">
+                            <div class="form-group">
+                                <label for="room">Room</label> <br> 
+                                <input name="room"  class="form-control" type="search" list="room" placeholder="Select or Type Custom Name" required>
+                                <datalist id="room" >
                                     <option value="Friends">Friends</option>
                                     <option value="Family">Family</option>
                                     <option value="Backbencher">Backbencher</option>
-                                    <option value="Parliament">Parliament</option>
-                                    <option value="Sangathan">Sangathan</option>
                                     <option value="Raila">Raila</option>
-                                </select>
-                            </div> <br> <br>
+                                </datalist>
+                            </div> <br>
                             <button type="submit" class="btn btn-dark">Join Chat</button>
                         </form>
 

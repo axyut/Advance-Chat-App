@@ -1,6 +1,11 @@
 //jshint esversion:6
 
 const path = require("path");
+const http = require("http"); 
+const socketIO = require("socket.io");
+const formatMessage = require("./utils/messages");
+const {userJoin, getCurrentUser, userLeave, getRoomUser} = require("./utils/users");
+
 require('dotenv').config();
 const express = require("express");
 const bodyParser= require("body-parser");
@@ -14,6 +19,9 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
+
 // Set static folder
 app.use(express.static(path.join(__dirname, "/public")));
 
@@ -29,7 +37,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-mongoose.connect("mongodb://localhost:27017/userDB", {
+mongoose.connect(process.env.MONGO_CONNECT, {
     useNewUrlParser: true
 });
 
@@ -51,6 +59,43 @@ passport.deserializeUser(function(id, done){
         done(err, user);
     });
 });
+
+
+// Run when client connects
+io.on('connection', socket=>{
+    socket.on('joinRoom', ({username,room})=>{
+
+        const user = userJoin(socket.id, username, room);
+        socket.join(user.room);
+
+        socket.emit('message', formatMessage('Chatbot','Welcome to Chat App!'));     // message to user
+        socket.broadcast.to(user.room).emit('message', formatMessage('Chatbot',`${user.username} joined the chat`));
+
+        // Send users and room information
+        io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
+    })
+
+
+    //Listen for chat Message
+    socket.on('chatMessage', msg=>{
+        const user = getCurrentUser(socket.id);
+        io.to(user.room).emit('message',formatMessage(user.username, msg));
+    });
+
+
+    socket.on('disconnect', () => {
+        const user = userLeave(socket.id);
+
+        if (user) {
+            io.to(user.room).emit('message',formatMessage('Chatbot', `${user.username} has left the chat.`));     // message to everybody    
+        }
+        // Send users and room information
+        io.to(user.room).emit('roomUsers', {room: user.room, users: getRoomUser(user.room)});
+    
+    });
+});
+
+
 
 app.get("/", function(req,res){
     res.render("home");
@@ -154,6 +199,6 @@ app.post("/login", function(req,res){
     });
 });
 
-app.listen(8000, function(){
+server.listen( process.env.PORT || 8000, function(){
 	console.log("server is started on port 8000");
 });
