@@ -21,6 +21,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 // google oauth20
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreate = require("mongoose-findorcreate");
+const { json } = require("body-parser");
 
 const app = express();
 const server = http.createServer(app);
@@ -110,8 +111,7 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(request, accessToken, refreshToken, profile, done) {
-    console.log(profile);
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    User.findOrCreate({ googleId: profile.id, username:profile.emails[0].value }, function (err, user) {
       return done(err, user);
     });
   }
