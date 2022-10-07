@@ -18,6 +18,10 @@ const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 
+// google oauth20
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const findOrCreate = require("mongoose-findorcreate");
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
@@ -43,10 +47,12 @@ mongoose.connect(process.env.MONGO_CONNECT, {
 
 const Schema = new mongoose.Schema({
     username: String,
-    password: String
+    password: String,
+    googleId: String
 });
 
 Schema.plugin(passportLocalMongoose);
+Schema.plugin(findOrCreate);
 
 const User = mongoose.model("User", Schema);
 
@@ -95,11 +101,38 @@ io.on('connection', socket=>{
     });
 });
 
+// oauth2.0
+passport.use(new GoogleStrategy({
+    clientID:     process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.CALL_BACK_URL,
+    passReqToCallback   : true,
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
+  },
+  function(request, accessToken, refreshToken, profile, done) {
+    console.log(profile);
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return done(err, user);
+    });
+  }
+));
 
 
 app.get("/", function(req,res){
     res.render("home");
 });
+
+app.get("/auth/google",
+  passport.authenticate('google', { scope:
+      [ 'email', 'profile' ] }
+));
+
+
+app.get( "/auth/google/secrets",
+    passport.authenticate( 'google', {
+        successRedirect: '/secrets',
+        failureRedirect: '/'
+}));
 
 app.get("/chat-anynomous", function(req,res){
     res.render("chat-anynomous");
