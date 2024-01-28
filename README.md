@@ -46,3 +46,7 @@ To get a local copy up and running follow these simple example steps.
    npm start
    npm run dev
 ```
+
+## Design 
+![front](./assets/zzzzooks.jpg)
+![chat_interface](./assets/chat.png)

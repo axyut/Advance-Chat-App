@@ -9,14 +9,14 @@ const userSchema = new mongoose.Schema({
 		required: [true, "Email is required."],
 		unique: true,
 		tirm: true,
-		minlength: 4,
-		maxlength: 12,
+		minlength: 8,
+		maxlength: 20,
 	},
 	password: {
 		type: String,
 		required: [true, "Password is required."],
-		minlength: 4,
-		maxlength: 24,
+		minlength: 8,
+		maxlength: 20,
 	},
 	googleId: { type: String },
 });

@@ -14,15 +14,15 @@ const logoutAPI = async (req, res) => {
 
 const registerAPI = async (req, res) => {
 	User.register(
-		{ username: req.body.username },
-		req.body.password,
+		{ username: req.body.username, password: req.body.password },
+
 		function (err, User) {
 			if (err) {
 				console.log(err);
 				res.redirect("/register");
 			} else {
 				passport.authenticate("local")(req, res, function () {
-					res.redirect("/secrets");
+					res.json({ User });
 				});
 			}
 		}
